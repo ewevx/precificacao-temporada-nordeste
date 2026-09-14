@@ -4,7 +4,10 @@ import pandas as pd
 import joblib
 import os
 
-from schemas import ImovelInput, PrevisaoOutput
+try:
+    from src.schemas import ImovelInput, PrevisaoOutput
+except ModuleNotFoundError:
+    from schemas import ImovelInput, PrevisaoOutput
 
 ml_models = {}
 
