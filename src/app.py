@@ -115,8 +115,14 @@ with col_dir:
             st.success("Cálculo realizado via FastAPI + Machine Learning Pipeline!")
             
         else:
-            st.error(f"Erro na validação da API (Código {response.status_code})")
-            st.write(response.json())
+            st.error(f"Erro no servidor backend (Código HTTP {response.status_code})")
+            if response.status_code in [502, 503, 504]:
+                st.warning("⏳ O servidor no Render está acordando (Cold Start do plano gratuito). Aguarde cerca de 1 minuto e tente novamente.")
+            else:
+                try:
+                    st.json(response.json())
+                except Exception:
+                    st.code(response.text[:500])
             
     except requests.exceptions.ReadTimeout:
         st.warning("⏱️ A API demorou para responder. Tente alterar o seletor novamente.")
