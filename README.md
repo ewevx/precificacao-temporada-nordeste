@@ -6,9 +6,8 @@ Solucao preditiva ponta a ponta voltada a otimizacao de receita (RevPAR) para al
 
 ## Acesso Rapido a Aplicacao em Producao
 
-* Painel Interativo (Streamlit Cloud): https://precificacao-temporada-nordeste.streamlit.app
+* Aplicacao Interativa (Streamlit Cloud): https://precificacao-temporada-nordeste-4p5nzuiqcl3psvel3uzyrs.streamlit.app/
 * Documentacao Interativa da API (FastAPI / Swagger): https://precificacao-temporada-nordeste.onrender.com/docs
-* Verificacao de Integridade (Health Check): https://precificacao-temporada-nordeste.onrender.com/health
 
 A infraestrutura conta com monitoramento automatizado a cada 10 minutos via UptimeRobot no endpoint /health, eliminando a latencia de partida a frio (cold start) e garantindo inferencia em tempo real com resposta inferior a 200 ms.
 
