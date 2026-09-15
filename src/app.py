@@ -1,43 +1,93 @@
-import streamlit as st
+import os
 import datetime
 import requests
-import os
+import streamlit as st
 
 # 1. Configuração da Página
 st.set_page_config(
-    page_title="Simulador de Precificação Dinâmica | Temporada Nordeste",
-    page_icon="🏖️",
+    page_title="Dynamic Pricing Engine | Vacation Rentals",
+    page_icon="🏢",
     layout="wide"
 )
 
-# Pega a URL da nuvem se configurada; caso contrário, usa o localhost
+# Resolução de endpoint (Produção vs Local)
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000/predict")
 
-# 2. Cabeçalho e Título
-st.title("🏖️ Precificação Inteligente de Temporada")
+# 2. Estilização CSS Minimalista - Paleta Verde Sofisticada
 st.markdown("""
-Simule a diária ideal do seu imóvel no litoral nordestino com base em características estruturais, 
-distância da praia, sazonalidade e condições climáticas/maregráficas.
-""")
+<style>
+    /* Tipografia e espaçamentos globais */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+    }
+    h1, h2, h3 {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+    
+    /* Destaque do Título em Verde Nobre */
+    h1 {
+        color: #059669 !important;
+    }
+    
+    /* Destaque da Diária com Verde Esmeralda Vibrante */
+    [data-testid="stMetricValue"] {
+        font-size: 2.3rem !important;
+        font-weight: 700;
+        color: #10b981 !important;
+    }
+    
+    /* Rótulo da métrica */
+    [data-testid="stMetricLabel"] {
+        font-size: 0.95rem !important;
+        color: #6ee7b7 !important;
+    }
+    
+    /* Indicador delta da métrica em tom suave */
+    [data-testid="stMetricDelta"] {
+        font-weight: 500;
+        color: #34d399 !important;
+    }
+
+    /* Borda sutil verde nos cards de resumo */
+    div[data-testid="stExpander"] {
+        border-color: rgba(16, 185, 129, 0.2) !important;
+    }
+
+    /* Divisores elegantes com gradiente esmeralda */
+    hr {
+        margin: 1.5rem 0;
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(16,185,129,0.4) 0%, rgba(16,185,129,0.05) 100%);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# 3. Cabeçalho Institucional
+st.title("Precificação Dinâmica de Imóveis por Temporada")
+st.caption("Motor preditivo para estimativa de receita e ajuste ótimo de diárias baseado em localização, características estruturais e sensibilidade climática.")
 st.divider()
 
-# 3. Estruturação dos Controles em Colunas
-col_esq, col_dir = st.columns([1.2, 1], gap="large")
+# 4. Painel de Controle e Parâmetros
+col_controles, col_resultado = st.columns([1.1, 1], gap="large")
 
-with col_esq:
-    st.subheader("📍 Características do Imóvel")
+with col_controles:
+    st.markdown("##### Especificações do Ativo")
     
     col_cidade, col_tipo = st.columns(2)
     with col_cidade:
         cidade = st.selectbox(
-            "Destino / Cidade",
+            "Destino",
             options=["Porto de Galinhas", "Maragogi", "Pipa", "Joao Pessoa", "Natal"],
-            index=0,
-            help="Selecione o município litorâneo onde o flat está localizado."
+            index=0
         )
     with col_tipo:
         tipo_imovel = st.selectbox(
-            "Classificação do Imóvel",
+            "Tipologia",
             options=["Flat", "Pousada", "Resort", "Outro"],
             index=0
         )
@@ -45,7 +95,7 @@ with col_esq:
     col_quartos, col_dist = st.columns(2)
     with col_quartos:
         qtd_quartos = st.number_input(
-            "Quantidade de Quartos",
+            "Quartos",
             min_value=1,
             max_value=10,
             value=1,
@@ -53,31 +103,30 @@ with col_esq:
         )
     with col_dist:
         distancia_m = st.slider(
-            "Distância da Praia (metros)",
+            "Distância da Orla (metros)",
             min_value=0,
             max_value=3000,
             value=150,
-            step=25,
-            help="0 metros indica imóvel pé na areia / beira-mar."
+            step=25
         )
 
-    st.subheader("🏊 Comodidades e Conveniência")
-    tem_piscina = st.checkbox("Possui Piscina Privativa ou Compartilhada", value=True)
+    tem_piscina = st.checkbox("Infraestrutura de piscina ativa", value=True)
 
-    st.subheader("📅 Data da Reserva e Condições")
+    st.divider()
+    st.markdown("##### Período e Dinâmica Exógena")
+    
     data_reserva = st.date_input(
         "Data de Check-in",
         value=datetime.date.today(),
-        min_value=datetime.date.today(),
-        help="Usado para definir finais de semana e sazonalidade."
+        min_value=datetime.date.today()
     )
 
-    with st.expander("🌦️ Ajuste de Condições Meteorológicas e Maré (Opcional)"):
+    with st.expander("Parâmetros Oceanográficos e Meteorológicos"):
         temperatura_max = st.slider("Temperatura Máxima Prevista (°C)", 20.0, 40.0, 28.5, 0.5)
-        precipitacao_mm = st.slider("Precipitação Prevista (mm de chuva)", 0.0, 50.0, 2.0, 0.5)
-        mare_ideal = st.checkbox("Maré Baixa no Dia (<= 0.5m - Piscinas Naturais)", value=True)
+        precipitacao_mm = st.slider("Precipitação Prevista (mm)", 0.0, 50.0, 2.0, 0.5)
+        mare_ideal = st.checkbox("Janela de Maré Baixa Adequada", value=True)
 
-# 4. Engenharia de Variáveis para Envio à API
+# 5. Engenharia de Atributos e Serialização
 eh_fim_de_semana = 1 if data_reserva.weekday() in [4, 5, 6] else 0
 dia_chuvoso = 1 if precipitacao_mm > 10.0 else 0
 
@@ -95,12 +144,11 @@ payload = {
     "mare_ideal_piscinas": 1 if mare_ideal else 0
 }
 
-# 5. Comunicação com a API e Exibição do Resultado
-with col_dir:
-    st.subheader("💡 Estimativa de Diária")
+# 6. Painel de Resultados e Validação de Negócio
+with col_resultado:
+    st.markdown("##### Recomendação de Tarifa")
     
     try:
-        # Timeout estendido para evitar falha no primeiro carregamento
         response = requests.post(API_URL, json=payload, timeout=15)
         
         if response.status_code == 200:
@@ -108,27 +156,36 @@ with col_dir:
             diaria = resultado["diaria_estimada"]
             
             st.metric(
-                label="Diária Sugerida pelo Modelo",
+                label="Diária Sugerida (Target)",
                 value=f"R$ {diaria:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
-                delta="Simulação Ativa em Tempo Real"
+                delta="Modelo calibrado em produção"
             )
-            st.success("Cálculo realizado via FastAPI + Machine Learning Pipeline!")
+            
+            # Quadro de decomposição dos drivers do imóvel
+            st.markdown("""
+            **Resumo do Cenário Avaliado**
+            """)
+            st.markdown(f"""
+            * **Localização:** {cidade} ({distancia_m}m do mar)
+            * **Padrão:** {tipo_imovel} | {qtd_quartos} dormitório(s)
+            * **Sazonalidade:** {"Fim de semana" if eh_fim_de_semana else "Dia de semana comercial"}
+            * **Condição Marítima:** {"Favorável" if mare_ideal else "Padrão regular"}
+            """)
             
         else:
-            st.error(f"Erro no servidor backend (Código HTTP {response.status_code})")
+            st.error(f"Instabilidade no serviço de inferência (Código {response.status_code})")
             if response.status_code in [502, 503, 504]:
-                st.warning("⏳ O servidor no Render está acordando (Cold Start do plano gratuito). Aguarde cerca de 1 minuto e tente novamente.")
+                st.info("O nó de computação está sendo inicializado. Aguarde alguns segundos para nova leitura.")
             else:
                 try:
                     st.json(response.json())
                 except Exception:
-                    st.code(response.text[:500])
-            
+                    st.code(response.text[:400])
+                    
     except requests.exceptions.ReadTimeout:
-        st.warning("⏱️ A API demorou para responder. Tente alterar o seletor novamente.")
+        st.warning("O tempo limite de resposta foi excedido. Tente atualizar os parâmetros.")
     except requests.exceptions.ConnectionError:
-        st.warning("⚠️ O servidor backend FastAPI não está acessível na porta 8000.")
-        st.info("Certifique-se de que o comando `uvicorn api:app --reload` está rodando em outro terminal.")
+        st.warning("Serviço backend indisponível no endereço configurado.")
 
-    st.caption("Payload enviado à API:")
-    st.json(payload)
+    with st.expander("Inspecionar Payload de Entrada (JSON)"):
+        st.json(payload)
