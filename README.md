@@ -1,3 +1,5 @@
+#### **"Os preços-base vêm de 625 anúncios coletados do Booking. A diária usada como alvo do modelo foi gerada por regra (+35% em feriados, −15% em dia de chuva, ruído de ±2%), não observada no mercado. Por isso o modelo reproduz essa regra e não prevê preços reais." Não publique MAE nem R² da precificação: o código de treino não está no repositório, e eu não vou inventar um número.**
+
 # Motor de Precificacao Dinamica para Imoveis de Temporada
 
 Solucao preditiva ponta a ponta voltada a otimizacao de receita (RevPAR) para alugueis de temporada no litoral nordestino, combinando atributos imobiliarios, sazonalidade, dados meteorologicos e dinamicas oceanograficas.
