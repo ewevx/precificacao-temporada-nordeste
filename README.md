@@ -95,7 +95,7 @@ JSON
 Clone o repositorio:
 
 Bash
-git clone https://github.com/ewevx/<precificacao-temporada-nordeste>.git
+git clone https://github.com/ewevx/precificacao-temporada-nordeste.git
 cd precificacao-temporada-nordeste
 Crie e ative o ambiente virtual:
 
