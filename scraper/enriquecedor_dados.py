@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import holidays
 from datetime import datetime, timedelta
+import os
 
 def criar_tabela_contexto():
     hoje = datetime.now()
@@ -18,7 +19,7 @@ def criar_tabela_contexto():
     feriados_nacionais = holidays.Brazil(years=[hoje.year, hoje.year + 1])
     
     # IMPORTANTE: Crie uma conta gratuita em stormglass.io e cole sua chave aqui
-    STORMGLASS_API_KEY = "eb62559e-ae21-11f1-8e3a-0242ac120004-eb625616-ae21-11f1-8e3a-0242ac120004" 
+    STORMGLASS_API_KEY = os.environ.get("STORMGLASS_API_KEY") 
     
     dados_contexto = []
     print("Extraindo Temperatura, Chuva e Tábua de Marés...")
