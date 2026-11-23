@@ -37,7 +37,7 @@ def criar_tabela_contexto():
         # 2. MARÉS - Stormglass
         mares_ideais = {data: 0 for data in datas}
         
-        if STORMGLASS_API_KEY != "COLE_SUA_CHAVE_AQUI":
+        if STORMGLASS_API_KEY:
             url_mare = f"https://api.stormglass.io/v2/tide/extremes/point?lat={coords['lat']}&lng={coords['lon']}&start={datas[0]}&end={datas[-1]}"
             resp_mare = requests.get(url_mare, headers={'Authorization': STORMGLASS_API_KEY})
             
